@@ -17,10 +17,19 @@ var ParseTree = function (rootNode) {
         else
             this.rightNode = child;
     };
-
+    this.tree = function () {
+        var operator = this.rootNode.value;
+        var leftNode = (this.leftNode.constructor==ParseTree?this.leftNode.tree():this.leftNode.value);
+        var rightNode = (this.rightNode.constructor==ParseTree?this.rightNode.tree():this.rightNode.value);
+        return [operator, leftNode, rightNode];
+    };
     this.toString = function () {
         return '(' + this.leftNode + this.rootNode + this.rightNode + ')';
-    }
+    };
 };
 
+
+
+
 module.exports = ParseTree;
+

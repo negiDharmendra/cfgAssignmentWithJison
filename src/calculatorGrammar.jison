@@ -43,14 +43,14 @@
 
 expression
     : expression EOF
-        {console.log($$); return $1}
+        {   return $1}
     | assignmentList
     | mExpression
     ;
 
 assignmentList
-    : assignmentList assignment
-        {   if($1[0].constructor == Array) $1.push($2);
+    :  assignmentList assignment
+        {   if($1[0].constructor == Array) {$1.push($2); }
             else $$ = [$1,$2];
         }
     | assignment
@@ -87,8 +87,17 @@ powerExpression
     ;
 
 identifier
-    : identifier '=' assignment
-        {$$ = [$2,$1,$3]}
+    : identifier '=' assignmentList
+       {    console.log("identifier--->",JSON.stringify($3))
+            if($3[0].constructor == Array) {
+                $$ = [[$2, $1, $3.shift()]];
+                for(var d in $3)
+                    $$.push($3[d])
+             }
+             else
+                $$ = [$2, $1, $3];
+
+        }
     | IDENTIFIER
         {$$ = yytext}
     ;

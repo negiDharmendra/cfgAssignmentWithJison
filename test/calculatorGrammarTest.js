@@ -57,9 +57,21 @@ describe('calculator grammar', function () {
             assert.deepEqual(actual, expected);
         });
 
+        it.skip("should represent a=5;2+4 as [['=', 'a', 2],['+',4,5]]", function () {
+            var actual = parser.parse('a=5;2+4');
+            var expected = [['=', 'a', 5],['+',2,4]];
+            assert.deepEqual(actual, expected);
+        });
+
         it("should represent a=v=2; as ['=', 'a', ['=', 'v', 2]]", function () {
             var actual = parser.parse('a=v=2;');
             var expected = ['=', 'a', ['=', 'v', 2]];
+            assert.deepEqual(actual, expected);
+        });
+
+        it.skip("should represent a=v=c=2; as ['=', 'a', ['=', 'v', 2]]", function () {
+            var actual = parser.parse('a=v=c=2;');
+            var expected = ['=', 'a', ['=', 'v', ['=','c',2]]];
             assert.deepEqual(actual, expected);
         });
 
@@ -69,7 +81,11 @@ describe('calculator grammar', function () {
             assert.deepEqual(actual, expected);
         });
 
-
+        it.skip("should represent a=c=3;b=2; as [['=', 'a', 3],['=','b',2]]", function () {
+            var actual = parser.parse('a=c=3;b=2;');
+            var expected = [['=', 'a', ['=', 'c', 3]],['=','b',2]];
+            assert.deepEqual(actual, expected);
+        });
 
         it("should represent a=2+3; as ['=', 'a', ['+', 2, 3]]", function () {
             var actual = parser.parse('a=2+3;');

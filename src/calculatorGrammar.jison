@@ -3,7 +3,13 @@
 /* description: Parses and executes mathematical expressions. */
 
 %{
-
+    function combineExpListAndExp($1,$2){
+        if($1[0].constructor == Array){
+            $1.push($2);
+            return $1
+        }
+        else return [$1,$2];
+    }
 %}
 
 /* lexical grammar */
@@ -44,15 +50,15 @@
 expression
     : expression EOF
         {   return $1}
+    | assignmentList mExpression
+        {   $$ = combineExpListAndExp($1,$2) }
     | assignmentList
     | mExpression
     ;
 
 assignmentList
     :  assignmentList assignment
-        {   if($1[0].constructor == Array) {$1.push($2); }
-            else $$ = [$1,$2];
-        }
+        {   $$ = combineExpListAndExp($1,$2) }
     | assignment
     ;
 
@@ -73,7 +79,6 @@ mExpression
     | mExpression '-' mExpression
         {$$ = [$2,$1,$3];}
     | powerExpression
-    | identifier
     | NUMBER
         {$$ = Number(yytext)}
     ;
@@ -87,17 +92,6 @@ powerExpression
     ;
 
 identifier
-    : identifier '=' assignmentList
-       {    console.log("identifier--->",JSON.stringify($3))
-            if($3[0].constructor == Array) {
-                $$ = [[$2, $1, $3.shift()]];
-                for(var d in $3)
-                    $$.push($3[d])
-             }
-             else
-                $$ = [$2, $1, $3];
-
-        }
-    | IDENTIFIER
+    : IDENTIFIER
         {$$ = yytext}
     ;

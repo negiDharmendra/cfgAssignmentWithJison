@@ -1,18 +1,8 @@
+%token IDENTIFIER
 
 /* description: Parses and executes mathematical expressions. */
 
 %{
-var path = require('path');
-var ParseTree = require(path.resolve('./src/parseTree.js'));
-var Node = require(path.resolve('./src/node.js')).Node;
-var NodeType = require(path.resolve('./src/node.js')).NodeType;
-
-var generateParseTree  = function($1 , $2, $3){
-    var parseTree  =  new ParseTree(new Node($2, NodeType.OPERATOR));
-    parseTree.addLeftNode($1);
-    parseTree.addRightNode($3);
-    return parseTree;
-}
 
 %}
 
@@ -20,10 +10,19 @@ var generateParseTree  = function($1 , $2, $3){
 %lex
 %%
 
+%token IDENTIFIER
+
 \s+                   /* skip whitespace */
 [0-9]+("."[0-9]+)?\b  return 'NUMBER'
-"+"                   return '+'
+[a-z]+                return 'IDENTIFIER'
 "*"                   return '*'
+"-"                   return '-'
+"+"                   return '+'
+"^"                   return '^'
+"="                   return '='
+"("                   return '('
+")"                   return ')'
+";"                   return ';'
 <<EOF>>               return 'EOF'
 .                     return 'INVALID'
 
@@ -31,29 +30,65 @@ var generateParseTree  = function($1 , $2, $3){
 
 /* operator associations and precedence */
 
-
-%left '+'
+%left '+' '-'
 %left '*'
+%left '^'
+%left '='
 
-
-%start expressions
+%start expression
 
 %% /* language grammar */
 
-expressions
-    : e EOF
-        { return $1; }
+
+
+expression
+    : expression EOF
+        {console.log($$); return $1}
+    | assignmentList
+    | mExpression
     ;
 
-e
-    : e '+' e
-        {
-            $$ = generateParseTree($1,$2,$3);
+assignmentList
+    : assignmentList assignment
+        {   if($1[0].constructor == Array) $1.push($2);
+            else $$ = [$1,$2];
         }
-    | e '*' e
-        {
-             $$ = generateParseTree($1,$2,$3);
-        }
+    | assignment
+    ;
+
+assignment
+    : identifier '=' mExpressionAssignment
+       {$$ = [$2,$1,$3];}
+    ;
+
+mExpressionAssignment
+    : mExpression ';'
+    ;
+
+mExpression
+    : mExpression '+' mExpression
+        {$$ = [$2,$1,$3];}
+    | mExpression '*' mExpression
+        {$$ = [$2,$1,$3];}
+    | mExpression '-' mExpression
+        {$$ = [$2,$1,$3];}
+    | powerExpression
+    | identifier
     | NUMBER
-        {$$ = Number(yytext);}
+        {$$ = Number(yytext)}
+    ;
+
+
+powerExpression
+    : '(' mExpression '^' mExpression ')'
+            {$$ = [$3,$2,$4];}
+    | mExpression '^' mExpression
+            {$$ = [$2,$1,$3];}
+    ;
+
+identifier
+    : identifier '=' assignment
+        {$$ = [$2,$1,$3]}
+    | IDENTIFIER
+        {$$ = yytext}
     ;

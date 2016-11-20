@@ -7,63 +7,80 @@ var Parser = require('jison').Parser;
 var parser = new Parser(grammar);
 
 describe('calculator grammar', function () {
-    describe('toString', function () {
-        it('should represent 1+2 as (one plus two)', function () {
-            var actual = parser.parse('1+2');
-            var expected = '(one plus two)';
-            expect(actual.toString()).to.be.equal(expected)
-        });
-
-        it('should represent 1+2+3 as ((one plus two) plus three)', function () {
-            var actual = parser.parse('1+2+3');
-            var expected = '((one plus two) plus three)';
-            expect(actual.toString()).to.be.equal(expected)
-        });
-
-        it('should represent 1*2 as (one times two)', function () {
-            var actual = parser.parse('1*2');
-            var expected = '(one times two)';
-            expect(actual.toString()).to.be.equal(expected)
-        });
-
-        it('should represent 1*2*3 as ((one times two) times three)', function () {
-            var actual = parser.parse('1*2*3');
-            var expected = '((one times two) times three)';
-            expect(actual.toString()).to.be.equal(expected)
-        });
-
-
-        it('should represent 1+2*3 as (one plus (two times three))', function () {
-            var actual = parser.parse('1+2*3');
-            var expected = '(one plus (two times three))';
-            expect(actual.toString()).to.be.equal(expected)
-        });
-
-
-        it('should represent 1000000000*2000000 as (one billion times two million)', function () {
-            var actual = parser.parse('1000000000*2000000');
-            var expected = '(one billion times two million)';
-            expect(actual.toString()).to.be.equal(expected)
-        });
-    });
-
-    describe('tree', function () {
-        it('should return 1+2 as ["+",1,2]', function () {
+        it("should represent 1+2 as ['+',1,2]", function () {
             var actual = parser.parse('1+2');
             var expected = ['+', 1, 2];
-            assert.deepEqual(actual.tree(), expected)
+            assert.deepEqual(actual, expected)
         });
-        it('should return  1+2*3 as ["+",1,["*",2,3]]', function () {
+
+        it("should represent 1+2+3 as ['+', ['+', 1, 2], 3]", function () {
+            var actual = parser.parse('1+2+3');
+            var expected = ['+', ['+', 1, 2], 3];
+            assert.deepEqual(actual, expected);
+        });
+
+        it("should represent 1*2 as ['*', 1, 2]", function () {
+            var actual = parser.parse('1*2');
+            var expected = ['*', 1, 2];
+            assert.deepEqual(actual, expected);
+        });
+
+        it("should represent 1*2*3 as ['*', ['*', 1, 2], 3]", function () {
+            var actual = parser.parse('1*2*3');
+            var expected = ['*', ['*', 1, 2], 3];
+            assert.deepEqual(actual, expected);
+        });
+
+
+        it("should represent 1+2*3 as ['+', 1, ['*', 2, 3]]", function () {
             var actual = parser.parse('1+2*3');
-            var expected = ["+", 1, ["*", 2, 3]];
-            assert.deepEqual(actual.tree(), expected)
-        });
-        it('should return  1+2+3*4 as ["+",["+",1,2],["*",3,4]]', function () {
-            var actual = parser.parse('1+2+3*4');
-            var expected = ["+", ["+", 1, 2], ["*", 3, 4]];
-            assert.deepEqual(actual.tree(), expected)
+            var expected = ['+', 1, ['*', 2, 3]];
+            assert.deepEqual(actual, expected);
         });
 
-    });
 
+        it("should represent 1000000000*2000000 as ['*', 1000000000, 2000000]", function () {
+            var actual = parser.parse('1000000000*2000000');
+            var expected = ['*', 1000000000, 2000000];
+            assert.deepEqual(actual, expected);
+        });
+
+        it("should represent 3^2; as ['^', 3, 2]", function () {
+            var actual = parser.parse('3^2');
+            var expected = ['^', 3, 2];
+            assert.deepEqual(actual, expected);
+        });
+
+        it("should represent a=2; as ['=', 'a', 2]", function () {
+            var actual = parser.parse('a=2;');
+            var expected = ['=', 'a', 2];
+            assert.deepEqual(actual, expected);
+        });
+
+        it("should represent a=v=2; as ['=', 'a', ['=', 'v', 2]]", function () {
+            var actual = parser.parse('a=v=2;');
+            var expected = ['=', 'a', ['=', 'v', 2]];
+            assert.deepEqual(actual, expected);
+        });
+
+        it("should represent a=3;b=2; as [['=', 'a', 3],['=','b',2]]", function () {
+            var actual = parser.parse('a=3;b=2;');
+            var expected = [['=', 'a', 3],['=','b',2]];
+            assert.deepEqual(actual, expected);
+        });
+
+
+
+        it("should represent a=2+3; as ['=', 'a', ['+', 2, 3]]", function () {
+            var actual = parser.parse('a=2+3;');
+            var expected = ['=', 'a', ['+', 2, 3]];
+            assert.deepEqual(actual, expected);
+        });
+
+        it("should be able to generate tree for a=23+23;f=4+4;d=4;d=4+45;", function () {
+            var actual = parser.parse('a=23+23;f=4+4;d=4;d=4+45;');
+            var expected = [ [ '=', 'a', [ '+', 23, 23 ] ],[ '=', 'f', [ '+', 4, 4 ] ],[ '=', 'd', 4 ],[ '=', 'd', [ '+', 4, 45 ] ] ];
+            assert.deepEqual(actual, expected);
+        });
 });
+

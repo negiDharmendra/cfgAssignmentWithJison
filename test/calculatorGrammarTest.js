@@ -8,45 +8,45 @@ var parser = new Parser(grammar);
 
 describe('calculator grammar', function () {
         it("should represent 1+2 as ['+',1,2]", function () {
-            var actual = parser.parse('1+2');
+            var actual = parser.parse('1+2;');
             var expected = ['+', 1, 2];
             assert.deepEqual(actual, expected)
         });
 
         it("should represent 1+2+3 as ['+', ['+', 1, 2], 3]", function () {
-            var actual = parser.parse('1+2+3');
+            var actual = parser.parse('1+2+3;');
             var expected = ['+', ['+', 1, 2], 3];
             assert.deepEqual(actual, expected);
         });
 
         it("should represent 1*2 as ['*', 1, 2]", function () {
-            var actual = parser.parse('1*2');
+            var actual = parser.parse('1*2;');
             var expected = ['*', 1, 2];
             assert.deepEqual(actual, expected);
         });
 
         it("should represent 1*2*3 as ['*', ['*', 1, 2], 3]", function () {
-            var actual = parser.parse('1*2*3');
+            var actual = parser.parse('1*2*3;');
             var expected = ['*', ['*', 1, 2], 3];
             assert.deepEqual(actual, expected);
         });
 
 
         it("should represent 1+2*3 as ['+', 1, ['*', 2, 3]]", function () {
-            var actual = parser.parse('1+2*3');
+            var actual = parser.parse('1+2*3;');
             var expected = ['+', 1, ['*', 2, 3]];
             assert.deepEqual(actual, expected);
         });
 
 
         it("should represent 1000000000*2000000 as ['*', 1000000000, 2000000]", function () {
-            var actual = parser.parse('1000000000*2000000');
+            var actual = parser.parse('1000000000*2000000;');
             var expected = ['*', 1000000000, 2000000];
             assert.deepEqual(actual, expected);
         });
 
         it("should represent 3^2; as ['^', 3, 2]", function () {
-            var actual = parser.parse('3^2');
+            var actual = parser.parse('3^2;');
             var expected = ['^', 3, 2];
             assert.deepEqual(actual, expected);
         });
@@ -58,13 +58,13 @@ describe('calculator grammar', function () {
         });
 
         it("should represent a=5;2+4 as [['=', 'a', 2],['+',4,5]]", function () {
-            var actual = parser.parse('a=5;2+4');
+            var actual = parser.parse('a=5;2+4;');
             var expected = [['=', 'a', 5],['+',2,4]];
             assert.deepEqual(actual, expected);
         });
 
         it("should represent a=5;a+4 as [['=', 'a', 2],['+',a,5]]", function () {
-            var actual = parser.parse('a=5;a+4');
+            var actual = parser.parse('a=5;a+4;');
             var expected = [['=', 'a', 5],['+','a',4]];
             assert.deepEqual(actual, expected);
         });

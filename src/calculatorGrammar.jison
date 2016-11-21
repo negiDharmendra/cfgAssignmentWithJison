@@ -4,9 +4,9 @@
 
 %{
     function combineExpListAndExp($1,$2){
-        if($1[0].constructor == Array){
-            $1.push($2);
-            return $1
+        if($2[0].constructor == Array){
+            $2.unshift($1);
+            return $2
         }
         else return [$1,$2];
     }
@@ -28,7 +28,7 @@
 "="                   return '='
 "("                   return '('
 ")"                   return ')'
-";"                   return ';'
+";"                   return 'TERMINATOR'
 <<EOF>>               return 'EOF'
 .                     return 'INVALID'
 
@@ -41,34 +41,31 @@
 %left '^'
 %left '='
 
-%start expression
+%start expressions
 
 %% /* language grammar */
 
 
 
-expression
+expressions
     : expression EOF
         {   return $1}
-    | assignmentList mExpression
-        {   $$ = combineExpListAndExp($1,$2) }
-    | assignmentList
-    | mExpression
     ;
 
-assignmentList
-    :  assignmentList assignment
-        {   $$ = combineExpListAndExp($1,$2) }
-    | assignment
+expression
+    : mExpression TERMINATOR
+    | declaration
+    | declaration expression
+        {   $$  = combineExpListAndExp($1,$2) }
+    ;
+
+declaration
+    : assignment
     ;
 
 assignment
-    : identifier '=' mExpressionAssignment
+    : identifier '='  mExpression TERMINATOR
        {$$ = [$2,$1,$3];}
-    ;
-
-mExpressionAssignment
-    : mExpression ';'
     ;
 
 mExpression
@@ -83,7 +80,6 @@ mExpression
     | NUMBER
         {$$ = Number(yytext)}
     ;
-
 
 powerExpression
     : '(' mExpression '^' mExpression ')'

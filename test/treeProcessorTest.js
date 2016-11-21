@@ -8,45 +8,45 @@ var parser = new Parser(grammar);
 
 describe('treeProcessor', function () {
     it("should represent 1+2 as [ plus,1,2]", function () {
-        var actual = treeProcessor(parser.parse('1+2'));
+        var actual = treeProcessor(parser.parse('1+2;'));
         var expected = '( plus one two )';
         assert.deepEqual(actual.trim(), expected)
     });
 
     it("should represent 1+2+3 as [ plus, [ plus, 1, 2], 3]", function () {
-        var actual = treeProcessor(parser.parse('1+2+3'));
+        var actual = treeProcessor(parser.parse('1+2+3;'));
         var expected = '( plus ( plus one two ) three )';
         assert.deepEqual(actual.trim(), expected);
     });
 
     it("should represent 1*2 as [ times 1, 2]", function () {
-        var actual = treeProcessor(parser.parse('1*2'));
+        var actual = treeProcessor(parser.parse('1*2;'));
         var expected = '( times one two )';
         assert.deepEqual(actual.trim(), expected);
     });
 
     it("should represent 1*2*3 as [ times [ times 1, 2], 3]", function () {
-        var actual = treeProcessor(parser.parse('1*2*3'));
+        var actual = treeProcessor(parser.parse('1*2*3;'));
         var expected = '( times ( times one two ) three )';
         assert.deepEqual(actual.trim(), expected);
     });
 
 
     it("should represent 1+2*3 as [ plus, 1, [ times 2, 3]]", function () {
-        var actual = treeProcessor(parser.parse('1+2*3'));
+        var actual = treeProcessor(parser.parse('1+2*3;'));
         var expected = '( plus one ( times two three ) )';
         assert.deepEqual(actual.trim(), expected);
     });
 
 
     it("should represent 1000000000*2000000 as [ times 1000000000, 2000000]", function () {
-        var actual = treeProcessor(parser.parse('1000000000*2000000'));
+        var actual = treeProcessor(parser.parse('1000000000*2000000;'));
         var expected = '( times one-billion two-million )';
         assert.deepEqual(actual.trim(), expected);
     });
 
     it("should represent 3^2; as [ pow, 3, 2]", function () {
-        var actual = treeProcessor(parser.parse('3^2'));
+        var actual = treeProcessor(parser.parse('3^2;'));
         var expected = '( pow three two )';
         assert.deepEqual(actual.trim(), expected);
     });
@@ -58,13 +58,13 @@ describe('treeProcessor', function () {
     });
 
     it("should represent a=5;2+4 as [[ equal 'a', 2],[ plus,4,5]]", function () {
-        var actual = treeProcessor(parser.parse('a=5;2+4'));
+        var actual = treeProcessor(parser.parse('a=5;2+4;'));
         var expected = '( ( equal a five ) ( plus two four ) )';
         assert.deepEqual(actual.trim(), expected);
     });
 
     it("should represent a=5;a+4 as [[ equal 'a', 2],[ plus,a,5]]", function () {
-        var actual = treeProcessor(parser.parse('a=5;a+4'));
+        var actual = treeProcessor(parser.parse('a=5;a+4;'));
         var expected = '( ( equal a five ) ( plus a four ) )';
         assert.deepEqual(actual.trim(), expected);
     });

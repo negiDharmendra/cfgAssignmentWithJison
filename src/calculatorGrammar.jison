@@ -79,6 +79,7 @@ mExpression
     | mExpression '-' mExpression
         {$$ = [$2,$1,$3];}
     | powerExpression
+    |identifier
     | NUMBER
         {$$ = Number(yytext)}
     ;

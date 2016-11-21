@@ -63,6 +63,12 @@ describe('calculator grammar', function () {
             assert.deepEqual(actual, expected);
         });
 
+        it("should represent a=5;a+4 as [['=', 'a', 2],['+',a,5]]", function () {
+            var actual = parser.parse('a=5;a+4');
+            var expected = [['=', 'a', 5],['+','a',4]];
+            assert.deepEqual(actual, expected);
+        });
+
         it.skip("should represent a=v=2; as ['=', 'a', ['=', 'v', 2]]", function () {
             var actual = parser.parse('a=v=2;');
             var expected = ['=', 'a', ['=', 'v', 2]];

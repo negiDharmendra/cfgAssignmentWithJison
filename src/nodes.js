@@ -14,6 +14,21 @@ nodes.NumberNode.prototype = {
     }
 };
 
+
+nodes.IdentifierNode = function (value) {
+    this.value = value;
+};
+
+nodes.IdentifierNode.prototype = {
+    evaluate: function (assignmentTable) {
+        return assignmentTable[this.value];
+    },
+    equalTo: function (object) {
+        return this.value === object.value;
+    }
+};
+
+
 nodes.AssignmentNode = function (value) {
     this.value = value;
     this.children = [];
@@ -27,13 +42,15 @@ nodes.AssignmentNode.prototype = {
     },
 
     evaluate: function (assignmentTable) {
-        var child = this.children[0];
-        if (child instanceof nodes.AssignmentNode) {
-            child.evaluate(assignmentTable);
-            assignmentTable[this.value] = child.value;
+        var identifier = this.children[0].value;
+        var valueNode = this.children[1];
+
+        if (valueNode instanceof nodes.AssignmentNode) {
+            valueNode.evaluate(assignmentTable);
+            assignmentTable[identifier] = valueNode.children[0].value;
         }
         else
-            assignmentTable[this.value] = child.evaluate(assignmentTable);
+            assignmentTable[identifier] = valueNode.evaluate();
     },
 
     equalTo: function (object) {

@@ -14,7 +14,8 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "jison": "^0.4.17",
-    "mocha": "^3.1.2"
+    "mocha": "^3.1.2",
+    "unexpected": "^10.19.0"
   },
   "dependencies": {
     "number-to-words": "^1.2.3"

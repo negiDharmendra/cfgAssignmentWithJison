@@ -10,12 +10,13 @@ nodes.AssignmentNode.prototype = {
         this.children.push(child);
     },
     evaluate: function (assignmentTable) {
-        var result = this.children.map(function (child) {
-            return child.evaluate();
-        });
-        assignmentTable[this.value] = result.reduce(function (prevVal, val) {
-            return prevVal + val;
-        });
+        var child = this.children[0];
+        if(child instanceof nodes.AssignmentNode) {
+            child.evaluate(assignmentTable);
+            assignmentTable[this.value] = child.value;
+        }
+        else
+            assignmentTable[this.value] = child.evaluate(assignmentTable);
     }
 };
 

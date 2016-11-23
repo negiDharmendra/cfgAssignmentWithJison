@@ -1,9 +1,10 @@
-var expect = require('unexpected');
+var expect = require('chai').expect;
 
 var AssignmentNode = require('../src/nodes.js').AssignmentNode;
 var OperatorNode = require('../src/nodes.js').OperatorNode;
 var NumberNode = require('../src/nodes.js').NumberNode;
 var IdentifierNode = require('../src/nodes.js').IdentifierNode;
+var SymbolTable = require('../src/symbolTable');
 
 describe('Nodes', function () {
     describe('IdentifierNode', function () {
@@ -11,27 +12,45 @@ describe('Nodes', function () {
             it('should return true object is of similar type with similar value', function () {
                 var identifierNode = new IdentifierNode('a');
                 var identifierNode1 = new IdentifierNode('a');
-                expect(identifierNode.equalTo(identifierNode1), 'to equal', true);
+                expect(identifierNode.equalTo(identifierNode1)).to.be.equal(true);
             });
 
             it('should return false object is of dissimilar type with similar value', function () {
                 var identifierNode = new IdentifierNode('a');
                 var identifierNode1 = new Object('a');
-                expect(identifierNode.equalTo(identifierNode1), 'to equal', false);
+                expect(identifierNode.equalTo(identifierNode1)).to.equal(false);
             });
 
             it('should return false object is of similar type with dissimilar value', function () {
                 var identifierNode = new IdentifierNode('a');
                 var identifierNode1 = new IdentifierNode('b');
-                expect(identifierNode.equalTo(identifierNode1), 'to equal', false);
+                expect(identifierNode.equalTo(identifierNode1)).to.equal(false);
             });
         });
 
-        describe('evaluate', function () {
-            var identifierNode = new IdentifierNode('a');
-            var actual = identifierNode.evaluate({a: 23});
 
-            expect(actual, 'to equal', 23);
+        describe('evaluate', function () {
+
+            var identifierNode;
+            var symbolTable;
+            beforeEach(function () {
+                identifierNode = new IdentifierNode('a');
+                symbolTable = new SymbolTable();
+            });
+
+            it('should evaluate it self', function () {
+                symbolTable.populate('a', 23);
+                var actual = identifierNode.evaluate(symbolTable);
+                expect(actual, 'to equal', 23);
+            });
+
+            it('should throw UndefinedIdentifierException', function () {
+                symbolTable.populate('b', 23);
+                var evaluate = function () {
+                    identifierNode.evaluate(symbolTable);
+                };
+                expect(evaluate).to.throw(Error, /undefined identifier => a/);
+            });
         });
     });
     describe('AssignmentNode', function () {
@@ -51,7 +70,7 @@ describe('Nodes', function () {
                 assignmentNode1.insertChild(new IdentifierNode('a'));
                 assignmentNode1.insertChild(new NumberNode(4));
 
-                expect(assignmentNode.equalTo(assignmentNode1), 'to equal', true);
+                expect(assignmentNode.equalTo(assignmentNode1)).to.be.equal(true);
 
             });
 
@@ -60,7 +79,7 @@ describe('Nodes', function () {
                 var operatorNode = new OperatorNode('+');
                 operatorNode.insertChild(new NumberNode(4));
 
-                expect(assignmentNode.equalTo(operatorNode), 'to equal', false);
+                expect(assignmentNode.equalTo(operatorNode)).to.equal(false);
 
             });
 
@@ -70,7 +89,7 @@ describe('Nodes', function () {
                 assignmentNode1.insertChild(new IdentifierNode('a'));
                 assignmentNode1.insertChild(new NumberNode(6));
 
-                expect(assignmentNode.equalTo(assignmentNode1), 'to equal', false);
+                expect(assignmentNode.equalTo(assignmentNode1)).to.equal(false);
 
             });
 
@@ -78,20 +97,20 @@ describe('Nodes', function () {
 
         describe('evaluate', function () {
 
-            var assignmentTable;
+            var symbolTable;
             var assignmentNode;
             beforeEach(function () {
-                assignmentTable = {};
+                symbolTable = new SymbolTable();
                 assignmentNode = new AssignmentNode('=');
                 assignmentNode.insertChild(new IdentifierNode('a'));
                 assignmentNode.insertChild(new NumberNode(4));
             });
 
             it('should evaluate it self and populate the assignment table', function () {
-                assignmentNode.evaluate(assignmentTable);
+                assignmentNode.evaluate(symbolTable);
 
                 var expectedAssignmentTable = {a: 4};
-                expect(assignmentTable, 'to equal', expectedAssignmentTable);
+                expect(symbolTable.table).to.be.deep.equal(expectedAssignmentTable);
             });
 
             it('should evaluate it self when children are of AssignmentNode type', function () {
@@ -103,10 +122,10 @@ describe('Nodes', function () {
                 assignmentNode2.insertChild(new NumberNode(4));
 
                 assignmentNode.insertChild(assignmentNode2);
-                assignmentNode.evaluate(assignmentTable);
+                assignmentNode.evaluate(symbolTable);
 
-                var expectedAssignmentTable = {a: 'b', b: 4};
-                expect(assignmentTable, 'to equal', expectedAssignmentTable);
+                var expectedAssignmentTable = {a: 4, b: 4};
+                expect(symbolTable.table).to.be.deep.equal(expectedAssignmentTable);
             });
 
         });
@@ -131,7 +150,7 @@ describe('Nodes', function () {
                     var plusOperatorNode1 = new OperatorNode('+');
                     plusOperatorNode1.insertChild(new NumberNode(4));
 
-                    expect(plusOperatorNode.equalTo(plusOperatorNode1), 'to equal', true);
+                    expect(plusOperatorNode.equalTo(plusOperatorNode1)).to.be.equal(true);
 
                 });
 
@@ -140,7 +159,7 @@ describe('Nodes', function () {
                     var assignmentNode = new AssignmentNode('a');
                     assignmentNode.insertChild(new NumberNode(4));
 
-                    expect(plusOperatorNode.equalTo(assignmentNode), 'to equal', false);
+                    expect(plusOperatorNode.equalTo(assignmentNode)).to.equal(false);
 
                 });
 
@@ -149,7 +168,7 @@ describe('Nodes', function () {
                     var plusOperatorNode1 = new OperatorNode('+');
                     plusOperatorNode1.insertChild(new NumberNode(6));
 
-                    expect(plusOperatorNode.equalTo(plusOperatorNode1), 'to equal', false);
+                    expect(plusOperatorNode.equalTo(plusOperatorNode1)).to.equal(false);
 
                 });
 
@@ -163,7 +182,7 @@ describe('Nodes', function () {
                     plusOperatorNode.insertChild(new NumberNode(4));
                     plusOperatorNode.insertChild(new NumberNode(5));
 
-                    expect(plusOperatorNode.evaluate(), 'to equal', 9);
+                    expect(plusOperatorNode.evaluate()).to.be.equal(9);
                 });
 
             });
@@ -185,7 +204,7 @@ describe('Nodes', function () {
                     var minusOperatorNode1 = new OperatorNode('-');
                     minusOperatorNode1.insertChild(new NumberNode(4));
 
-                    expect(minusOperatorNode.equalTo(minusOperatorNode1), 'to equal', true);
+                    expect(minusOperatorNode.equalTo(minusOperatorNode1)).to.be.equal(true);
 
                 });
 
@@ -194,7 +213,7 @@ describe('Nodes', function () {
                     var assignmentNode = new AssignmentNode('a');
                     assignmentNode.insertChild(new NumberNode(4));
 
-                    expect(minusOperatorNode.equalTo(assignmentNode), 'to equal', false);
+                    expect(minusOperatorNode.equalTo(assignmentNode)).to.equal(false);
 
                 });
 
@@ -203,7 +222,7 @@ describe('Nodes', function () {
                     var minusOperatorNode1 = new OperatorNode('-');
                     minusOperatorNode1.insertChild(new NumberNode(6));
 
-                    expect(minusOperatorNode.equalTo(minusOperatorNode1), 'to equal', false);
+                    expect(minusOperatorNode.equalTo(minusOperatorNode1)).to.equal(false);
 
                 });
 
@@ -215,7 +234,7 @@ describe('Nodes', function () {
                     minusOperatorNode.insertChild(new NumberNode(4));
                     minusOperatorNode.insertChild(new NumberNode(5));
 
-                    expect(minusOperatorNode.evaluate(), 'to equal', -1);
+                    expect(minusOperatorNode.evaluate()).to.be.equal(-1);
                 });
 
             });
@@ -236,7 +255,7 @@ describe('Nodes', function () {
                     var minusOperatorNode1 = new OperatorNode('*');
                     minusOperatorNode1.insertChild(new NumberNode(4));
 
-                    expect(minusOperatorNode.equalTo(minusOperatorNode1), 'to equal', true);
+                    expect(minusOperatorNode.equalTo(minusOperatorNode1)).to.be.equal(true);
 
                 });
 
@@ -245,7 +264,7 @@ describe('Nodes', function () {
                     var assignmentNode = new AssignmentNode('a');
                     assignmentNode.insertChild(new NumberNode(4));
 
-                    expect(minusOperatorNode.equalTo(assignmentNode), 'to equal', false);
+                    expect(minusOperatorNode.equalTo(assignmentNode)).to.equal(false);
 
                 });
 
@@ -254,7 +273,7 @@ describe('Nodes', function () {
                     var minusOperatorNode1 = new OperatorNode('*');
                     minusOperatorNode1.insertChild(new NumberNode(6));
 
-                    expect(minusOperatorNode.equalTo(minusOperatorNode1), 'to equal', false);
+                    expect(minusOperatorNode.equalTo(minusOperatorNode1)).to.equal(false);
 
                 });
 
@@ -265,7 +284,7 @@ describe('Nodes', function () {
                     mulOperatorNode.insertChild(new NumberNode(4));
                     mulOperatorNode.insertChild(new NumberNode(5));
 
-                    expect(mulOperatorNode.evaluate(), 'to equal', 20);
+                    expect(mulOperatorNode.evaluate()).to.be.equal(20);
                 });
             });
 
@@ -285,7 +304,7 @@ describe('Nodes', function () {
                     var minusOperatorNode1 = new OperatorNode('/');
                     minusOperatorNode1.insertChild(new NumberNode(4));
 
-                    expect(minusOperatorNode.equalTo(minusOperatorNode1), 'to equal', true);
+                    expect(minusOperatorNode.equalTo(minusOperatorNode1)).to.be.equal(true);
 
                 });
 
@@ -294,7 +313,7 @@ describe('Nodes', function () {
                     var assignmentNode = new AssignmentNode('a');
                     assignmentNode.insertChild(new NumberNode(4));
 
-                    expect(minusOperatorNode.equalTo(assignmentNode), 'to equal', false);
+                    expect(minusOperatorNode.equalTo(assignmentNode)).to.equal(false);
 
                 });
 
@@ -303,7 +322,7 @@ describe('Nodes', function () {
                     var minusOperatorNode1 = new OperatorNode('/');
                     minusOperatorNode1.insertChild(new NumberNode(6));
 
-                    expect(minusOperatorNode.equalTo(minusOperatorNode1), 'to equal', false);
+                    expect(minusOperatorNode.equalTo(minusOperatorNode1)).to.equal(false);
 
                 });
 
@@ -315,7 +334,7 @@ describe('Nodes', function () {
                     divisionOperatorNode.insertChild(new NumberNode(20));
                     divisionOperatorNode.insertChild(new NumberNode(2));
 
-                    expect(divisionOperatorNode.evaluate(), 'to equal', 1);
+                    expect(divisionOperatorNode.evaluate()).to.be.equal(1);
                 });
             });
 
@@ -330,7 +349,7 @@ describe('Nodes', function () {
                     powOperatorNode.insertChild(new NumberNode(3));
                     powOperatorNode.insertChild(new NumberNode(2));
 
-                    expect(powOperatorNode.evaluate(), 'to equal', 19683);
+                    expect(powOperatorNode.evaluate()).to.be.equal(19683);
                 });
             });
 

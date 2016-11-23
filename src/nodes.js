@@ -21,10 +21,16 @@ nodes.IdentifierNode = function (value) {
 
 nodes.IdentifierNode.prototype = {
     evaluate: function (assignmentTable) {
-        return assignmentTable[this.value];
+        var value = assignmentTable.getValueOf(this.value);
+        if(!value)
+            throw new Error('undefined identifier => '+this.value);
+        return value;
     },
     equalTo: function (object) {
         return this.value === object.value;
+    },
+    toString: function () {
+        return this.value.toString();
     }
 };
 
@@ -42,15 +48,10 @@ nodes.AssignmentNode.prototype = {
     },
 
     evaluate: function (assignmentTable) {
-        var identifier = this.children[0].value;
-        var valueNode = this.children[1];
-
-        if (valueNode instanceof nodes.AssignmentNode) {
-            valueNode.evaluate(assignmentTable);
-            assignmentTable[identifier] = valueNode.children[0].value;
-        }
-        else
-            assignmentTable[identifier] = valueNode.evaluate();
+        var identifier = this.children[0];
+        var value = this.children[1].evaluate(assignmentTable);
+        assignmentTable.populate(identifier,value);
+        return value;
     },
 
     equalTo: function (object) {

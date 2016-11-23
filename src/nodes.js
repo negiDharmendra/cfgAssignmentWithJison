@@ -1,3 +1,4 @@
+var CUSTOM_ERROR = require('./customErrors');
 var nodes = {};
 var operators = {};
 
@@ -22,8 +23,8 @@ nodes.IdentifierNode = function (value) {
 nodes.IdentifierNode.prototype = {
     evaluate: function (assignmentTable) {
         var value = assignmentTable.getValueOf(this.value);
-        if(!value)
-            throw new Error('undefined identifier => '+this.value);
+        if (!value)
+            throw new CUSTOM_ERROR.UndefinedIdentifierException(this.value);
         return value;
     },
     equalTo: function (object) {
@@ -50,7 +51,7 @@ nodes.AssignmentNode.prototype = {
     evaluate: function (assignmentTable) {
         var identifier = this.children[0];
         var value = this.children[1].evaluate(assignmentTable);
-        assignmentTable.populate(identifier,value);
+        assignmentTable.populate(identifier, value);
         return value;
     },
 
@@ -72,8 +73,8 @@ nodes.OperatorNode.prototype = {
         this.children.push(child);
     },
 
-    evaluate: function () {
-        return operators[this.value].apply(this).value;
+    evaluate: function (symbolTable) {
+        return operators[this.value].apply(this, [symbolTable]).value;
     },
 
     equalTo: function (object) {
@@ -86,38 +87,42 @@ nodes.OperatorNode.prototype = {
 
 operators = {
 
-    '+': function () {
+    '+': function (symbolTable) {
         return this.children.reduce(function (prevVal, currentVal) {
-            var out = prevVal.evaluate() + currentVal.evaluate();
+            var out = prevVal.evaluate(symbolTable) + currentVal.evaluate(symbolTable);
             return new nodes.NumberNode(out);
         });
     },
 
-    '-': function () {
+    '-': function (symbolTable) {
         return this.children.reduce(function (prevVal, currentVal) {
-            var out = prevVal.evaluate() - currentVal.evaluate();
+            var out = prevVal.evaluate(symbolTable) - currentVal.evaluate(symbolTable);
             return new nodes.NumberNode(out);
         });
     },
 
-    '*': function () {
+    '*': function (symbolTable) {
         return this.children.reduce(function (prevVal, currentVal) {
-            var out = prevVal.evaluate() * currentVal.evaluate();
+            var out = prevVal.evaluate(symbolTable) * currentVal.evaluate(symbolTable);
             return new nodes.NumberNode(out);
         });
     },
 
-    '/': function () {
+    '/': function (symbolTable) {
         return this.children.reduce(function (prevVal, currentVal) {
-            var out = prevVal.evaluate() / currentVal.evaluate();
+            var currentEvaluatedVal = currentVal.evaluate(symbolTable);
+            var prevEvaluatedVal = prevVal.evaluate(symbolTable);
+            if (currentEvaluatedVal === 0)
+                throw new CUSTOM_ERROR.DivisionByZeroException(prevEvaluatedVal, currentEvaluatedVal);
+            var out = prevEvaluatedVal / currentEvaluatedVal;
             return new nodes.NumberNode(out);
         });
     },
 
-    '^': function () {
+    '^': function (symbolTable) {
         var reversedValues = this.children.reverse();
         return reversedValues.reduce(function (prevVal, currentVal) {
-            var out = Math.pow(currentVal.evaluate(), prevVal.evaluate());
+            var out = Math.pow(currentVal.evaluate(symbolTable), prevVal.evaluate(symbolTable));
             return new nodes.NumberNode(out);
         });
     }

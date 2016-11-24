@@ -8,13 +8,19 @@ var repl = {};
 var rl = readLine.createInterface({
     input: process.stdin,
     output: process.stdout,
-    terminal: true
+    terminal: true,
+    prompt: '==> '
 });
+rl.prompt();
 
-function callRepl(callBack, parser) {
+function stdinMode(parser) {
     rl.on('line', function (text) {
-        process.stdout.write(callBack(text, parser));
+        process.stdout.write(takeOperation(text, parser));
         process.stdout.write('\n');
+        rl.prompt();
+    });
+    rl.on('close', function () {
+        process.exit(0);
     });
 }
 
@@ -28,10 +34,10 @@ function takeOperation(text, parser) {
         return e.message;
     }
 }
-
-function stdinMode(parser) {
-    return callRepl(takeOperation, parser);
-}
+//
+// function stdinMode(parser) {
+//     return callRepl(takeOperation, parser);
+// }
 
 process.stdin.setRawMode(true);
 process.stdin.resume();

@@ -45,14 +45,21 @@
 
 expressions
     : expression EOF
-        { return $1 }
+        { return Lib.convertToList($1) }
     ;
 
 expression
-    : mExpression TERMINATOR
+    : mExpressions
+    | mExpressions expression
+        {  $$  = Lib.combineExpListAndExp($1,$2) }
     | declaration
     | declaration expression
         {  $$  = Lib.combineExpListAndExp($1,$2) }
+    ;
+
+
+mExpressions
+    : mExpression TERMINATOR
     ;
 
 declaration

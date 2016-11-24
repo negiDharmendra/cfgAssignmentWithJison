@@ -37,4 +37,10 @@ lib.combineExpListAndExp = function (exp, expList) {
     else return [exp, expList];
 };
 
+lib.convertToList = function(expression){
+    if(expression instanceof Array)
+        return expression;
+    return [expression];
+};
+
 module.exports = lib;

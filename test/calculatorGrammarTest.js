@@ -18,9 +18,23 @@ describe('calculator grammar', function () {
         var operatorNode = new OperatorNode('+');
         operatorNode.insertChild(new NumberNode(1));
         operatorNode.insertChild(new NumberNode(2));
-        var expected = operatorNode;
-        console.log(JSON.stringify(actual));
-        console.log(JSON.stringify(expected));
+        var expected = [operatorNode];
+        assert.deepEqual(actual, expected);
+    });
+
+    it("should represent 1+2;4+4; as [['+',1,2],['+',4,4]]", function () {
+        var actual = parser.parse('1+2;4+4;');
+
+        var operatorNode = new OperatorNode('+');
+        operatorNode.insertChild(new NumberNode(1));
+        operatorNode.insertChild(new NumberNode(2));
+
+        var secondOperatorNode = new OperatorNode('+');
+        secondOperatorNode.insertChild(new NumberNode(4));
+        secondOperatorNode.insertChild(new NumberNode(4));
+
+        var expected = [operatorNode, secondOperatorNode];
+
         assert.deepEqual(actual, expected);
     });
 
@@ -35,7 +49,7 @@ describe('calculator grammar', function () {
         rootOperatorNode.insertChild(childOperatorNode);
         rootOperatorNode.insertChild(new NumberNode(3));
 
-        var expected = rootOperatorNode;
+        var expected = [rootOperatorNode];
 
         assert.deepEqual(actual, expected);
     });
@@ -45,7 +59,7 @@ describe('calculator grammar', function () {
         var operatorNode = new OperatorNode('*');
         operatorNode.insertChild(new NumberNode(1));
         operatorNode.insertChild(new NumberNode(2));
-        var expected = operatorNode;
+        var expected = [operatorNode];
         assert.deepEqual(actual, expected);
     });
 
@@ -60,7 +74,7 @@ describe('calculator grammar', function () {
         rootOperatorNode.insertChild(childOperatorNode);
         rootOperatorNode.insertChild(new NumberNode(3));
 
-        var expected = rootOperatorNode;
+        var expected = [rootOperatorNode];
 
         assert.deepEqual(actual, expected);
     });
@@ -77,7 +91,7 @@ describe('calculator grammar', function () {
         rootOperatorNode.insertChild(new NumberNode(1));
         rootOperatorNode.insertChild(childOperatorNode);
 
-        var expected = rootOperatorNode;
+        var expected = [rootOperatorNode];
 
         assert.deepEqual(actual, expected);
     });
@@ -89,8 +103,7 @@ describe('calculator grammar', function () {
         var operatorNode = new OperatorNode('*');
         operatorNode.insertChild(new NumberNode(1000000000));
         operatorNode.insertChild(new NumberNode(2000000));
-        var expected = operatorNode;
-        assert.deepEqual(actual, expected);
+        var expected = [operatorNode];
 
         assert.deepEqual(actual, expected);
     });
@@ -101,7 +114,7 @@ describe('calculator grammar', function () {
         var operatorNode = new OperatorNode('^');
         operatorNode.insertChild(new NumberNode(3));
         operatorNode.insertChild(new NumberNode(2));
-        var expected = operatorNode;
+        var expected = [operatorNode];
 
         assert.deepEqual(actual, expected);
     });
@@ -111,7 +124,9 @@ describe('calculator grammar', function () {
         var assignmentNode = new AssignmentNode('=');
         assignmentNode.insertChild(new IdentifierNode('a'));
         assignmentNode.insertChild(new NumberNode(2));
-        assert.deepEqual(actual, assignmentNode);
+
+        var expected = [assignmentNode];
+        assert.deepEqual(actual, expected);
     });
 
     it("should represent a=5;2+4 as [['=', 'a', 2],['+',4,5]]", function () {
@@ -169,7 +184,7 @@ describe('calculator grammar', function () {
         expectedNode.insertChild(new IdentifierNode('a'));
         expectedNode.insertChild(operatorNode);
 
-        assert.deepEqual(actual, expectedNode);
+        assert.deepEqual(actual, [expectedNode]);
     });
 
     it("should be able to generate tree for a=23+23;f=4+4;d=4;d=4+45;", function () {

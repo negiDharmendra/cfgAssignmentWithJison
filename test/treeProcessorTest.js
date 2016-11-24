@@ -3,10 +3,10 @@ var expect = require('chai').expect;
 var TreeProcessor = require('../src/treeProcessor.js');
 var UndefinedIdentifierException = require('../src/customErrors').UndefinedIdentifierException;
 
-var AssignmentNode = require('../src/nodes.js').AssignmentNode;
-var OperatorNode = require('../src/nodes.js').OperatorNode;
-var NumberNode = require('../src/nodes.js').NumberNode;
-var IdentifierNode = require('../src/nodes.js').IdentifierNode;
+var AssignmentNode = require('../src/assignmentNode');
+var OperatorNode = require('../src/operatorNode');
+var NumberNode = require('../src/numberNode');
+var IdentifierNode = require('../src/identifierNode');
 var SymbolTable = require('../src/symbolTable.js');
 
 

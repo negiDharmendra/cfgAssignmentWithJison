@@ -1,5 +1,5 @@
 var numberToWords = require('number-to-words').toWords;
-var AssignmentNode = require('./nodes').AssignmentNode;
+var AssignmentNode = require('./assignmentNode');
 var operators = {'+': 'plus', '*': 'times', '^': 'pow', '-': 'minus', '=': 'equal'};
 
 

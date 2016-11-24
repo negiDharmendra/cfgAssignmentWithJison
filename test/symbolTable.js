@@ -1,7 +1,7 @@
 var expect = require('unexpected');
 var SymbolTable = require('../src/symbolTable.js');
-var IdentifierNode = require('../src/nodes.js').IdentifierNode;
-var NumberNode = require('../src/nodes.js').NumberNode;
+var IdentifierNode = require('../src/identifierNode');
+var NumberNode = require('../src/numberNode');
 
 describe('SymbolTable', function () {
 

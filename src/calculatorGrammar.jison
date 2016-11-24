@@ -4,12 +4,11 @@
 
 %{
 
-var path = require('path');
-var AssignmentNode = require(path.resolve('./src/nodes.js')).AssignmentNode;
-var OperatorNode = require(path.resolve('./src/nodes.js')).OperatorNode;
-var NumberNode = require(path.resolve('./src/nodes.js')).NumberNode;
-var IdentifierNode = require(path.resolve('./src/nodes.js')).IdentifierNode;
-
+    var path = require('path');
+    var AssignmentNode = require(path.resolve('./src/assignmentNode.js'));
+    var OperatorNode = require(path.resolve('./src/operatorNode'));
+    var NumberNode = require(path.resolve('./src/numberNode'));
+    var IdentifierNode = require(path.resolve('./src/identifierNode'));
 
     function combineExpListAndExp($1,$2){
         if($2.constructor == Array){

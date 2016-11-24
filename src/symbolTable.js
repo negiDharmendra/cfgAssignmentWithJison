@@ -1,5 +1,3 @@
-var nodes = require('./nodes.js');
-
 var SymbolTable = function () {
     this.table = {};
 };

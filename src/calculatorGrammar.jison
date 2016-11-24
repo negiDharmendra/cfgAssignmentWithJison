@@ -5,18 +5,7 @@
 %{
 
     var path = require('path');
-    var AssignmentNode = require(path.resolve('./src/assignmentNode.js'));
-    var OperatorNode = require(path.resolve('./src/operatorNode'));
-    var NumberNode = require(path.resolve('./src/numberNode'));
-    var IdentifierNode = require(path.resolve('./src/identifierNode'));
-
-    function combineExpListAndExp($1,$2){
-        if($2.constructor == Array){
-            $2.unshift($1);
-            return $2
-        }
-        else return [$1,$2];
-    }
+    var Lib = require(path.resolve('./src/lib.js'));
 %}
 
 /* lexical grammar */
@@ -63,7 +52,7 @@ expression
     : mExpression TERMINATOR
     | declaration
     | declaration expression
-        {  $$  = combineExpListAndExp($1,$2) }
+        {  $$  = Lib.combineExpListAndExp($1,$2) }
     ;
 
 declaration
@@ -73,59 +62,41 @@ declaration
 assignment
     : identifier '='  mExpression TERMINATOR
        {
-           var assignmentNode = new AssignmentNode($2);
-           assignmentNode.insertChild($1);
-           assignmentNode.insertChild($3);
-           $$ = assignmentNode;
+           $$ = Lib.createAssignmentNode($1,$2,$3);
        }
     ;
 
 mExpression
     : mExpression '+' mExpression
         {
-            var operatorNode = new OperatorNode($2);
-            operatorNode.insertChild($1);
-            operatorNode.insertChild($3);
-            $$ = operatorNode;
+            $$ = Lib.createOperatorNode($1,$2,$3);
         }
     | mExpression '*' mExpression
         {
-            var operatorNode = new OperatorNode($2);
-            operatorNode.insertChild($1);
-            operatorNode.insertChild($3);
-            $$ = operatorNode;
+            $$ = Lib.createOperatorNode($1,$2,$3);
         }
     | mExpression '-' mExpression
        {
-           var operatorNode = new OperatorNode($2);
-           operatorNode.insertChild($1);
-           operatorNode.insertChild($3);
-           $$ = operatorNode;
+            $$ = Lib.createOperatorNode($1,$2,$3);
        }
     | powerExpression
     |identifier
     | NUMBER
-        {$$ = new NumberNode(Number(yytext));}
+        {$$ = Lib.createNumberNode(Number(yytext));}
     ;
 
 powerExpression
     : '(' mExpression '^' mExpression ')'
-            {
-                var operatorNode = new OperatorNode($3);
-                operatorNode.insertChild($2);
-                operatorNode.insertChild($4);
-                $$ = operatorNode;
-            }
+        {
+            $$ = Lib.createOperatorNode($2,$3,$4);
+        }
     | mExpression '^' mExpression
-           {
-               var operatorNode = new OperatorNode($2);
-               operatorNode.insertChild($1);
-               operatorNode.insertChild($3);
-               $$ = operatorNode;
-           }
+       {
+            $$ = Lib.createOperatorNode($1,$2,$3);
+       }
     ;
 
 identifier
     : IDENTIFIER
-        {$$ = new IdentifierNode(yytext);}
+        {$$ = Lib.createIdentifierNode(yytext);}
     ;

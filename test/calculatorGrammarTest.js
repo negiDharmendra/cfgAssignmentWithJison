@@ -19,6 +19,8 @@ describe('calculator grammar', function () {
         operatorNode.insertChild(new NumberNode(1));
         operatorNode.insertChild(new NumberNode(2));
         var expected = operatorNode;
+        console.log(JSON.stringify(actual));
+        console.log(JSON.stringify(expected));
         assert.deepEqual(actual, expected);
     });
 

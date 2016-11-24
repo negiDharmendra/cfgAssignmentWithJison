@@ -54,6 +54,29 @@ describe('calculator grammar', function () {
         assert.deepEqual(actual, expected);
     });
 
+    it("should represent 10/2 as ['/',10,2]", function () {
+        var actual = parser.parse('10/2;');
+        var operatorNode = new OperatorNode('/');
+        operatorNode.insertChild(new NumberNode(10));
+        operatorNode.insertChild(new NumberNode(2));
+        var expected = [operatorNode];
+        assert.deepEqual(actual, expected);
+    });
+
+    it("should represent 20/10/2 as ['/',['/',20,10],2]", function () {
+        var actual = parser.parse('20/10/2;');
+        var operatorNode = new OperatorNode('/');
+        operatorNode.insertChild(new NumberNode(20));
+        operatorNode.insertChild(new NumberNode(10));
+
+        var secondOperatorNode = new OperatorNode('/');
+        secondOperatorNode.insertChild(operatorNode);
+        secondOperatorNode.insertChild(new NumberNode(2));
+
+        var expected = [secondOperatorNode];
+        assert.deepEqual(actual, expected);
+    });
+
     it("should represent 1*2 as ['*', 1, 2]", function () {
         var actual = parser.parse('1*2;');
         var operatorNode = new OperatorNode('*');
@@ -209,6 +232,36 @@ describe('calculator grammar', function () {
         assignmentNodeD.insertChild(new NumberNode(4));
 
         var expected = [assignmentNodeA, assignmentNodeB, assignmentNodeD, operatorNode];
+        assert.deepEqual(actual, expected);
+    });
+
+    it("should be able to generate tree for a=23;f=10/5;d=4+45;", function () {
+        var actual = parser.parse('a=23;f=10/5;d=4+45;');
+
+        var plusOperatorNode = new OperatorNode('+');
+        plusOperatorNode.insertChild(new NumberNode(4));
+        plusOperatorNode.insertChild(new NumberNode(45));
+
+        var divideOperatorNode = new OperatorNode('/');
+        divideOperatorNode.insertChild(new NumberNode(10));
+        divideOperatorNode.insertChild(new NumberNode(5));
+
+        var assignmentNodeA = new AssignmentNode('=');
+        assignmentNodeA.insertChild(new IdentifierNode('a'));
+        assignmentNodeA.insertChild(new NumberNode(23));
+
+
+
+        var assignmentNodeB = new AssignmentNode('=');
+        assignmentNodeB.insertChild(new IdentifierNode('f'));
+        assignmentNodeB.insertChild(divideOperatorNode);
+
+
+        var assignmentNodeD = new AssignmentNode('=');
+        assignmentNodeD.insertChild(new IdentifierNode('d'));
+        assignmentNodeD.insertChild(plusOperatorNode);
+
+        var expected = [assignmentNodeA, assignmentNodeB, assignmentNodeD];
         assert.deepEqual(actual, expected);
     });
 

@@ -20,6 +20,7 @@
 "*"                   return '*'
 "-"                   return '-'
 "+"                   return '+'
+"/"                   return '/'
 "^"                   return '^'
 "="                   return '='
 "("                   return '('
@@ -34,6 +35,7 @@
 
 %left '+' '-'
 %left '*'
+%left '/'
 %left '^'
 %left '='
 
@@ -83,6 +85,10 @@ mExpression
             $$ = Lib.createOperatorNode($1,$2,$3);
         }
     | mExpression '-' mExpression
+       {
+            $$ = Lib.createOperatorNode($1,$2,$3);
+       }
+    | mExpression '/' mExpression
        {
             $$ = Lib.createOperatorNode($1,$2,$3);
        }
